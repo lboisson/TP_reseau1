@@ -14,10 +14,9 @@ void error(char *msg) {
 
 int main(int argc, char *argv[]) {
 
-  int sockfd, newsockfd, portno;
+  int sockfd, newsockfd, portno, n;
   char buffer[256];
   struct sockaddr_in serv_addr, cli_addr;
-  int n;
 
   /*usage */
   if (argc < 2)	{
@@ -56,18 +55,14 @@ int main(int argc, char *argv[]) {
     error("erreur sur la fonction accept");
   }
 
-  bzero(buffer,256);
   /* initialisation du buffer */
   bzero(buffer,256);
-  n = read(newsockfd,buffer,255);
-  if (n < 0) {
+  if (read(newsockfd,buffer,255) < 0) {
     error("impossible de lire dans le socket");
   }
 
   system("mkdir -p tmp");
-
   char fileName[100];
-
   memset (fileName, 0, sizeof (fileName));
   strcpy(fileName, "./tmp/");
   printf("le fichier : %s ", buffer);
@@ -92,7 +87,7 @@ int main(int argc, char *argv[]) {
   fclose(file);
   printf("Le fichier a ete copié.\n");
 
-  if (write(newsockfd, "le fichier a bien ete transferer",strlen("le fichier a bien ete transferer")) < 0){
+  if (write(newsockfd, "le fichier a bien ete transferer",strlen("le fichier a bien ete transferer") < 0)){
     error("erreur : pendant l'ecriture depuis le socket");
   }
   close(newsockfd);

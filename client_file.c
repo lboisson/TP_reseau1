@@ -83,6 +83,11 @@ int main(int argc, char *argv[])
     }
     fclose(file);
   }
+  /* reponse du serveur */
+  if (read(sockfd,buffer,255) < 0){
+    error("erreur : pendant la lecture depuis le socket");
+  }
+  printf("%s\n",buffer);
   close(sockfd);
   return 0;
 }

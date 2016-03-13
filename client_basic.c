@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
   /* reponse du serveur */
   if (read(sockfd,buffer,255) < 0){
-    error("erreur : pendant l'écriture depuis le socket");
+    error("erreur : pendant la lecture depuis le socket");
   }
   printf("%s\n",buffer);
 
