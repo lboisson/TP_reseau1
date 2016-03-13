@@ -87,9 +87,6 @@ int main(int argc, char *argv[]) {
   fclose(file);
   printf("Le fichier a ete copié.\n");
 
-  if (write(newsockfd, "le fichier a bien ete transferer",strlen("le fichier a bien ete transferer") < 0)){
-    error("erreur : pendant l'ecriture depuis le socket");
-  }
   close(newsockfd);
   close(sockfd);
 
