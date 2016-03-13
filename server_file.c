@@ -75,10 +75,9 @@ int main(int argc, char *argv[]) {
 
   FILE * file = fopen(fileName, "w");
 
-  /*n = write(newsockfd,"OK",2); [> on peut commencer l'envoie<]*/
-  /*if (n < 0){*/
-    /*error("ERROR writing to socket");*/
-  /*}*/
+  if (write(newsockfd,"OK",2) < 0){
+    error("ERROR writing to socket");
+  }
 
   bzero(buffer,256);
   n = read(newsockfd,buffer,255);

@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
   char buffer[256];
 
   if (argc < 3){ /* USAGE ! */
-    fprintf(stderr,"usage %s hostname port\n", argv[0]);
+    fprintf(stderr,"usage : %s <hostname> <port>\n", argv[0]);
     exit(0);
   }
 
@@ -35,43 +35,41 @@ int main(int argc, char *argv[])
   /*Creation d'un socket*/
   sockfd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM = TCP
   if (sockfd < 0){
-    error("ERROR opening socket");
+    error("impossible de creer le socket");
   }
 
 
   server = gethostbyname(argv[1]);/* adresse du serveur*/
   if (server == NULL) {
-    error("ERROR no such host");
+    error("le serveur n'existe pas");
   }
 
   /* RAZ de l'adresse serv */
   bzero((char *) &serv_addr, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   bcopy((char *)server->h_addr,(char *)&serv_addr.sin_addr.s_addr,server->h_length);
-
   serv_addr.sin_port = htons(portno);/* définition du port */
 
   if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0){
-    error("ERROR connecting");
+    error("impossible de se connecter au serveur");
   }
 
   /* Dialog */
   char buf[CHUNK];
   FILE *file;
   size_t nread;
-  printf("Please enter the file: ");
+  printf("Saisissez le nom du fichier: ");
   bzero(buffer,256);
   scanf("%s", buffer );
 
-  n = write(sockfd,buffer,strlen(buffer));/* Envoie */
-  if (n < 0){
-    error("ERROR writing to socket");
+  if (write(sockfd,buffer,strlen(buffer)) < 0){
+    error("erreur : pendant la lecture depuis le socket");
   }
-  sleep(1);
-  /*n = read(sockfd,buffer,255);[> Réponse ? on peut envoyer ? <]*/
-  /*if (n < 0){*/
-    /*error("ERROR reading from socket");*/
-  /*}*/
+  //sleep(1);
+
+  if (read(sockfd,buffer,255) < 0){
+    error("ERROR reading from socket");
+  }
 
   file = fopen(buffer, "r");
   if (file) {
@@ -79,7 +77,7 @@ int main(int argc, char *argv[])
       /*fwrite(buf, 1, nread, stdout);*/
       n = write(sockfd, buf, nread);/* Envoie */
       if (n != nread) {
-        puts("ERROR can't send file");
+        puts("impossible d'envoyer le fichier");
         fclose(file);
         exit(1);
       }
