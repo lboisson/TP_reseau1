@@ -18,13 +18,14 @@ void error(char *msg) {
 
 int main(int argc, char *argv[])
 {
-  int sockfd, portno, n;
+  int sockfd, portno;
   struct sockaddr_in serv_addr;
   struct hostent *server;
 
   char buffer[256];
 
-  if (argc < 3){ /* USAGE ! */
+  /* usage */
+  if (argc < 3){
     fprintf(stderr,"usage : %s <hostname> <port>\n", argv[0]);
     exit(0);
   }
@@ -65,7 +66,6 @@ int main(int argc, char *argv[])
   if (write(sockfd,buffer,strlen(buffer)) < 0){
     error("erreur : pendant la lecture depuis le socket");
   }
-  //sleep(1);
 
   if (read(sockfd,buffer,255) < 0){
     error("ERROR reading from socket");
@@ -74,9 +74,8 @@ int main(int argc, char *argv[])
   file = fopen(buffer, "r");
   if (file) {
     while ((nread = fread(buf, 1, sizeof buf, file)) > 0){
-      /*fwrite(buf, 1, nread, stdout);*/
-      n = write(sockfd, buf, nread);/* Envoie */
-      if (n != nread) {
+      fwrite(buf, 1, nread, stdout);
+      if (write(sockfd, buf, nread) != nread) {
         puts("impossible d'envoyer le fichier");
         fclose(file);
         exit(1);

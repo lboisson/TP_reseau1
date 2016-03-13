@@ -19,15 +19,16 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in serv_addr, cli_addr;
   int n;
 
+  /*usage */
   if (argc < 2)	{
-    fprintf(stderr,"ERROR, no port provided\n");
+    fprintf(stderr,"usage : %s <port>\n", argv[0]);
     exit(1);
   }
   /* Creation d'un socket*/
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
   if (sockfd < 0) {
-    error("ERROR opening socket");
+    error("impossible de creer le socket");
   }
   /* RAZ de l'adresse serv */
   bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
 
   /* liaison entre le socker crée précédemment et la définition du serveur juste au dessus */
   if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0){
-    error("ERROR on binding");
+    error("erreur : bind impossible");
   }
 
   listen(sockfd,5);/* 5 client max */
@@ -52,15 +53,15 @@ int main(int argc, char *argv[]) {
   /* cli_addr contient TOUT */
 
   if (newsockfd < 0){
-    error("ERROR on accept");
+    error("erreur sur la fonction accept");
   }
 
   bzero(buffer,256);
-  /* RAZ de buffer */
-  bzero(buffer,256);/*raz*/
+  /* initialisation du buffer */
+  bzero(buffer,256);
   n = read(newsockfd,buffer,255);
   if (n < 0) {
-    error("ERROR reading from socket");
+    error("impossible de lire dans le socket");
   }
 
   system("mkdir -p tmp");
@@ -69,27 +70,31 @@ int main(int argc, char *argv[]) {
 
   memset (fileName, 0, sizeof (fileName));
   strcpy(fileName, "./tmp/");
-  printf("file : %s ", buffer);
+  printf("le fichier : %s ", buffer);
   strcat(fileName, buffer);
-  printf("will be copyed in %s\n", fileName);
+  printf("va etre copié dans %s\n", fileName);
 
   FILE * file = fopen(fileName, "w");
 
   if (write(newsockfd,"OK",2) < 0){
-    error("ERROR writing to socket");
+    error("impossible d'ecrire dans le socket");
   }
 
   bzero(buffer,256);
   n = read(newsockfd,buffer,255);
   while (n != 0) {
     if (n < 0) {
-      error("ERROR reading from socket");
+      error("impossible de lire dans le socket");
     }
     fwrite(buffer, sizeof(char), n , file); // n = sizeof(buffer)
     n = read(newsockfd,buffer,255);
   }
   fclose(file);
-  printf("File copied.\n");
+  printf("Le fichier a ete copié.\n");
+
+  if (write(newsockfd, "le fichier a bien ete transferer",strlen("le fichier a bien ete transferer")) < 0){
+    error("erreur : pendant l'ecriture depuis le socket");
+  }
   close(newsockfd);
   close(sockfd);
 

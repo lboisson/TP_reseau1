@@ -58,20 +58,20 @@ int main(int argc, char *argv[]) {
   /* cli_addr contient TOUT */
 
   if (newsockfd < 0){
-    error("ERROR on accept");
+    error("erreur sur la fonction accept");
   }
 
   /* le buffer est initialisé à 0*/
   bzero(buffer,256);
 
   if (read(newsockfd,buffer,255) < 0) {
-    error("ERROR reading from socket");
+    error("impossible de lire dans le socket");
   }
 
   printf("message recu: %s\n",buffer);
 
   if (write(newsockfd,"message recu par le serveur.", strlen("message recu par le serveur.") < 0)){
-    error("ERROR writing to socket");
+    error("impossible d'ecrire dans le socket");
   }
   close(newsockfd);
   close(sockfd);
