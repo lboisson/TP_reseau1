@@ -1,4 +1,6 @@
-/* serveur TCP le numéro de port est passé comme argument */
+/* serveur TCP qui recoit une chaine de characteres.
+le numéro de port est passé comme argument */
+
 #include <unistd.h> /* read write */
 #include <stdlib.h> /* exit(0) */
 #include <string.h> /* bzero */
@@ -7,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h> /* en-tête définit la structure sockaddr_in */
 
+/*affiche un message d'erreur sur la sortie d'erreur standard*/
 void error(char *msg) {
   perror(msg);
   exit(1);
@@ -14,36 +17,39 @@ void error(char *msg) {
 
 int main(int argc, char *argv[]) {
 
-  int sockfd, newsockfd, portno;
+  int sockfd, newsockfd, numero_port;
   char buffer[256];
   struct sockaddr_in serv_addr, cli_addr;
-  int n;
 
+  /* dans le cas ou il n'y a pas suffisament d'arguments à la fonction*/
   if (argc < 2)	{
-    fprintf(stderr,"ERROR, no port provided\n");
+    fprintf(stderr,"usage : %s <port>\n", argv[0]);
     exit(1);
   }
-  /* Creation d'un socket*/
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
+  /*Creation d'un socket, en IPv4 (AF_INET)*/
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) {
-    error("ERROR opening socket");
+    error("impossible de creer le socket");
   }
-  /* RAZ de l'adresse serv */
+
+  /*initialise serv_addr avec des 0 */
   bzero((char *) &serv_addr, sizeof(serv_addr));
   /* char to int */
-  portno = atoi(argv[1]);
+  numero_port = atoi(argv[1]);
 
+  /*definit le protocole internet*/
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = INADDR_ANY;
-  serv_addr.sin_port = htons(portno);/* définition du port */
+  serv_addr.sin_port = htons(numero_port);/* définition du port */
 
-  /* liaison entre le socker crée précédemment et la définition du serveur juste au dessus */
+  /* bind entre le socket et la definition serveur dans serv_addr */
   if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0){
-    error("ERROR on binding");
+    error("erreur : bind impossible");
   }
 
-  listen(sockfd,5);/* 5 client max */
+  /* attend les connections sur le socket. Limite la file a 5 connections. */
+  listen(sockfd,5);
 
   socklen_t clilen = sizeof(cli_addr);
   newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);
@@ -55,18 +61,16 @@ int main(int argc, char *argv[]) {
     error("ERROR on accept");
   }
 
+  /* le buffer est initialisé à 0*/
   bzero(buffer,256);
-  /* RAZ de buffer */
-  n = read(newsockfd,buffer,255);
 
-  if (n < 0) {
+  if (read(newsockfd,buffer,255) < 0) {
     error("ERROR reading from socket");
   }
 
-  printf("Here is the message: %s\n",buffer);
+  printf("message recu: %s\n",buffer);
 
-  n = write(newsockfd,"I got your message",18); /* 18 longueur du message */
-  if (n < 0){
+  if (write(newsockfd,"message recu par le serveur.", strlen("message recu par le serveur.") < 0)){
     error("ERROR writing to socket");
   }
   close(newsockfd);
