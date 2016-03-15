@@ -56,6 +56,11 @@ int main(int argc, char * argv[])
 
     //Bind
     rc = bind(sd, (struct sockaddr *) &localAddr, sizeof(localAddr));
+
+    printf("sockaddr_in->sin_family : %hu\n", localAddr.sin_family);
+    printf("sockaddr_in->sin_addr.s_addr : %u\n", localAddr.sin_addr.s_addr);
+    printf("sockaddr_in->sin_port : %hu\n\n", localAddr.sin_port);
+
     if(rc < 0)
     {
         printf("%s : cannot bind port TCP %u\n", argv[0], SERVER_PORT);
@@ -65,6 +70,9 @@ int main(int argc, char * argv[])
 
     //Connexion au serveur
     rc = connect(sd, (struct sockaddr *) &servAddr, sizeof(servAddr));
+    printf("sockaddr_in->sin_family : %hu\n", localAddr.sin_family);
+    printf("sockaddr_in->sin_addr.s_addr : %u\n", localAddr.sin_addr.s_addr);
+    printf("sockaddr_in->sin_port : %hu\n\n", localAddr.sin_port);
     if(rc < 0)
     {
         perror("Cannot connect : ");
