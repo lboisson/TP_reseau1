@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
   file = fopen(buffer, "r");
   if (file) {
-    while ((nread = fread(buf, 1, sizeof buf, file)) > 0){
+    while ((nread = fread(buf, 1, sizeof bsuf, file)) > 0){
       fwrite(buf, 1, nread, stdout);
       if (write(sockfd, buf, nread) != nread) {
         puts("impossible d'envoyer le fichier");
