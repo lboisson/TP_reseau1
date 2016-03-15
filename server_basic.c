@@ -1,80 +1,161 @@
-/* serveur TCP qui recoit une chaine de characteres.
-le numéro de port est passé comme argument */
-
-#include <unistd.h> /* read write */
-#include <stdlib.h> /* exit(0) */
-#include <string.h> /* bzero */
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h> /* en-tête définit la structure sockaddr_in */
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
 
-/*affiche un message d'erreur sur la sortie d'erreur standard*/
-void error(char *msg) {
-  perror(msg);
-  exit(1);
+
+#define SUCCESS 0
+#define ERROR 1
+#define SERVER_PORT 1500
+#define MAX_MSG 100
+
+#define END_LINE 0x0
+
+
+//Declaration de la fonction read_line
+int read_line (int newSd,char * line_to_return);
+
+
+//////////
+// MAIN //
+//////////
+
+int main(int argc,char *argv[])
+{
+
+    int sd,newSd;
+    socklen_t cliLen;
+
+    struct sockaddr_in cliAddr, servAddr;
+    char line[MAX_MSG];
+
+    //Creaction de la socket
+    sd = socket(AF_INET,SOCK_STREAM,0);
+    if(sd<0)
+    {
+        perror("Cannot open socket");
+        exit(ERROR);
+    }
+
+    //Initialisation des champs de la structure servAddr
+    servAddr.sin_family = AF_INET;
+    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servAddr.sin_port = htons (SERVER_PORT);
+
+    //Bind
+    if(bind(sd,(struct sockaddr *) &servAddr, sizeof(servAddr))<0)
+    {
+        perror("Cannot bind port");
+        exit(ERROR);
+    }
+
+    //Listen
+    listen(sd,5);
+
+    while (1)
+    {
+        printf("%s : waiting for data on port TCP %u \n",argv[0],SERVER_PORT);
+        cliLen = sizeof(cliAddr);
+	//Acceptation de la connexion
+        newSd = accept(sd,(struct sockaddr *) &cliAddr,&cliLen);
+        if(newSd<0)
+        {
+            perror("Cannot accept connection");
+            exit(ERROR);
+        }
+
+        //Raz de la chaine de caracteres
+        memset(line,0x0,MAX_MSG);
+
+        //Reception des segments
+        while(read_line(newSd,line)!= ERROR)
+        {
+            printf("%s: received from %s:TCP%d : %s \n",argv[0],inet_ntoa(cliAddr.sin_addr),ntohs(cliAddr.sin_port),line);
+            //Raz de la chaine de caracteres
+            memset(line,0x0,MAX_MSG);
+        }
+
+    }
+
+    return(SUCCESS);
 }
 
-int main(int argc, char *argv[]) {
 
-  int sockfd, newsockfd, numero_port;
-  char buffer[256];
-  struct sockaddr_in serv_addr, cli_addr;
 
-  /* dans le cas ou il n'y a pas suffisament d'arguments à la fonction*/
-  if (argc < 2)	{
-    fprintf(stderr,"usage : %s <port>\n", argv[0]);
-    exit(1);
-  }
+/////////////////
+// FUNCTION(S) //
+/////////////////
 
-  /*Creation d'un socket, en IPv4 (AF_INET)*/
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) {
-    error("impossible de creer le socket");
-  }
+int read_line (int newSd,char * line_to_return)
+{
+    static int rcv_ptr=0;
+    static char rcv_msg[MAX_MSG];
+    static int n;
+    int offset;
 
-  /*initialise serv_addr avec des 0 */
-  bzero((char *) &serv_addr, sizeof(serv_addr));
-  /* char to int */
-  numero_port = atoi(argv[1]);
+    offset=0;
 
-  /*definit le protocole internet*/
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_addr.s_addr = INADDR_ANY;
-  serv_addr.sin_port = htons(numero_port);/* définition du port */
+    while(1)
+    {
+        if(rcv_ptr==0)
+        {
+            /* read data from socket */
+            memset(rcv_msg,0x0,MAX_MSG);/* init buffer */
+            n = recv(newSd,rcv_msg,MAX_MSG,0); /* wait for data */
+            if(n < 0)
+            {
+                perror("Cannot receive data ");
+                return ERROR;
+            }
+            else if(n==0)
+            {
+                printf("Connection closed by client \n");
+                close(newSd);
+                return ERROR;
+            }
+        }
 
-  /* bind entre le socket et la definition serveur dans serv_addr */
-  if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0){
-    error("erreur : bind impossible");
-  }
+        /* if new data read on socket */
+        /* OR */
+        /* if another lise is still in buffer */
+        /* copy ligne into 'line_to_return'*/
+        while(*(rcv_msg+rcv_ptr)!=END_LINE && rcv_ptr<n)
+        {
+            memcpy(line_to_return+offset,rcv_msg+rcv_ptr,1);
+            offset++;
+            rcv_ptr++;
+        }
 
-  /* attend les connections sur le socket. Limite la file a 5 connections. */
-  listen(sockfd,5);
+        /* end of line + end of buffer => return line */
+        if(rcv_ptr == n-1)
+        {
+            /* set last by to END_LINE */
+            *(line_to_return+offset)=END_LINE;
+            rcv_ptr=0;
+            return ++offset;
+        }
 
-  socklen_t clilen = sizeof(cli_addr);
-  newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);
-  /* extraire la première connexion de la file des connexions en attente */
-  /* créez un nouveau socket avec le même protocole  */
-  /* cli_addr contient TOUT */
 
-  if (newsockfd < 0){
-    error("erreur sur la fonction accept");
-  }
+        /* end of line but still some data in buffer => return line */
+        if(rcv_ptr < n-1)
+        {
+            /* set last by to END_LINE */
+            *(line_to_return+offset)=END_LINE;
+            rcv_ptr++;
+            return ++offset;
+        }
 
-  /* le buffer est initialisé à 0*/
-  bzero(buffer,256);
-
-  if (read(newsockfd,buffer,255) < 0) {
-    error("impossible de lire dans le socket");
-  }
-
-  printf("message recu: %s\n",buffer);
-
-  if (write(newsockfd,"message recu par le serveur.", strlen("message recu par le serveur.") < 0)){
-    error("impossible d'ecrire dans le socket");
-  }
-  close(newsockfd);
-  close(sockfd);
-
-  return 0;
+        /* end of buffer but line is not ended => */
+        /* wait for more data to arrive on socket */
+        if(rcv_ptr == n)
+        {
+            rcv_ptr = 0;
+        }
+    }
 }

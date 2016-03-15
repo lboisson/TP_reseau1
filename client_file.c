@@ -1,89 +1,105 @@
-/* client TCP le numéro de l'adresse et le port est passé comme argument */
-
-#include <stdlib.h> /*exit(0)*/
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h> /* en-tête définit la structure sockaddr_in */
-#include <string.h> /* Lenght */
-#include <netdb.h> /* gethostbyname */
-#include <unistd.h> /* read write */
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
-#define CHUNK 1024 /* read 1024 bytes at a time */
+#define SUCCESS 0
+#define ERROR 1
+#define SERVER_PORT 1500
+#define MAX_MSG 100
 
-void error(char *msg) {
-  perror(msg);
-  exit(0);
-}
-
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
-  int sockfd, portno;
-  struct sockaddr_in serv_addr;
-  struct hostent *server;
 
-  char buffer[256];
+    int sd, rc;
+    struct sockaddr_in localAddr, servAddr;
+    struct hostent * h;
 
-  /* usage */
-  if (argc < 3){
-    fprintf(stderr,"usage : %s <hostname> <port>\n", argv[0]);
-    exit(0);
-  }
+    FILE *file; //Fichier à envoyer
 
-  /* char to int */
-  portno = atoi(argv[2]);
-
-  /*Creation d'un socket*/
-  sockfd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM = TCP
-  if (sockfd < 0){
-    error("impossible de creer le socket");
-  }
-
-
-  server = gethostbyname(argv[1]);/* adresse du serveur*/
-  if (server == NULL) {
-    error("le serveur n'existe pas");
-  }
-
-  /* RAZ de l'adresse serv */
-  bzero((char *) &serv_addr, sizeof(serv_addr));
-  serv_addr.sin_family = AF_INET;
-  bcopy((char *)server->h_addr,(char *)&serv_addr.sin_addr.s_addr,server->h_length);
-  serv_addr.sin_port = htons(portno);/* définition du port */
-
-  if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0){
-    error("impossible de se connecter au serveur");
-  }
-
-  /* Dialog */
-  char buf[CHUNK];
-  FILE *file;
-  size_t nread;
-  printf("Saisissez le nom du fichier: ");
-  bzero(buffer,256);
-  scanf("%s", buffer );
-
-  if (write(sockfd,buffer,strlen(buffer)) < 0){
-    error("erreur : pendant la lecture depuis le socket");
-  }
-
-  if (read(sockfd,buffer,255) < 0){
-    error("ERROR reading from socket");
-  }
-
-  file = fopen(buffer, "r");
-  if (file) {
-    while ((nread = fread(buf, 1, sizeof bsuf, file)) > 0){
-      fwrite(buf, 1, nread, stdout);
-      if (write(sockfd, buf, nread) != nread) {
-        puts("impossible d'envoyer le fichier");
-        fclose(file);
-        exit(1);
-      }
+    if(argc != 3)
+    {
+        printf("Usage : %s <server> <file ref>\n", argv[0]);
+        exit(ERROR);
     }
-    fclose(file);
-  }
 
-  close(sockfd);
-  return 0;
+    h = gethostbyname(argv[1]);
+    if(h == NULL)
+    {
+        printf("%s : Uncknow host '%s'", argv[0], argv[1]);
+        exit(ERROR);
+    }
+
+    //Initialisation des champs de la structure servAddr
+    servAddr.sin_family = h->h_addrtype;
+    memcpy((char *)&servAddr.sin_addr.s_addr, h->h_addr_list[0], h->h_length);
+    servAddr.sin_port = htons(SERVER_PORT);
+
+    //Creation de la socket
+    sd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sd < 0)
+    {
+        perror("Cannot open socket : ");
+        exit(ERROR);
+    }
+
+    //Initialisation des champs de la structure servAddr
+    localAddr.sin_family = AF_INET; //internet
+    localAddr.sin_addr.s_addr = htonl(INADDR_ANY); //tout le monde peut se connecter au client
+    localAddr.sin_port = htons(0); //port d'écoute du client (0 : numéro de port logiciel attribué par le SE)
+
+    //Bind
+    rc = bind(sd, (struct sockaddr *) &localAddr, sizeof(localAddr));
+    if(rc < 0)
+    {
+        printf("%s : cannot bind port TCP %u\n", argv[0], SERVER_PORT);
+        perror("Error : ");
+        exit(ERROR);
+    }
+
+    //Connexion au serveur
+    rc = connect(sd, (struct sockaddr *) &servAddr, sizeof(servAddr));
+    if(rc < 0)
+    {
+        perror("Cannot connect : ");
+        exit(ERROR);
+    }
+
+    /* Envoi des données */
+
+    //On ouvre le fichier à envoyer
+    file = NULL;
+    file = fopen ( argv[2], "r" );
+
+    if( file != NULL )
+    {
+        char line[MAX_MSG-1];
+
+        while ( fgets ( line, sizeof line, file ) != NULL )
+        {
+            rc = send(sd, line, strlen(line)+1, 0);
+
+            if(rc < 0)
+            {
+                printf("Cannot send data : ");
+                close(sd);
+                exit(ERROR);
+            }
+        }
+
+        fclose ( file );
+    }
+    else
+    {
+        perror("Cannot open file : ");
+        exit(ERROR);
+    }
+
+    return(SUCCESS);
 }

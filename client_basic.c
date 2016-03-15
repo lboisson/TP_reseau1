@@ -1,81 +1,89 @@
-/* client TCP pour envoyer une chaine de characteres.
-L'adresse du serveur et le port sont passés comme argument */
-
-#include <stdlib.h> /*exit(0)*/
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h> /* en-tête définit la structure sockaddr_in */
-#include <string.h> /* Lenght */
-#include <netdb.h> /* gethostbyname */
-#include <unistd.h> /* read write */
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
-/*affiche un message d'erreur sur la sortie d'erreur standard*/
-void error(char *msg) {
-  perror(msg);
-  exit(0);
-}
+#define SUCCESS 0
+#define ERROR 1
+#define SERVER_PORT 1500
+#define MAX_MSG 100
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
-  int sockfd, numero_port;
-  struct sockaddr_in serv_addr;
-  struct hostent *serveur;
 
-  char buffer[256];
+    int sd, rc, i;
+    struct sockaddr_in localAddr, servAddr;
+    struct hostent * h;
 
-  /* dans le cas ou il n'y a pas suffisament d'arguments à la fonction*/
-  if (argc < 3){
-    fprintf(stderr,"usage : %s <hostname> <port>\n", argv[0]);
-    exit(0);
-  }
+    //Verification du nombre d'arguments
+    if(argc < 3)
+    {
+        printf("Usage : %s <server> <data1> <data2> ... <dataN>\n", argv[0]);
+        exit(ERROR);
+    }
 
-  /* char to int du 2nd argument */
-  numero_port = atoi(argv[2]);
+    h = gethostbyname(argv[1]);
+    if(h == NULL)
+    {
+        printf("%s : Uncknow host '%s'", argv[0], argv[1]);
+        exit(ERROR);
+    }
 
-  /*Creation d'un socket, en IPv4 (AF_INET)*/
-  sockfd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM = TCP
-  if (sockfd < 0){
-    error("impossible de creer le socket");
-  }
+    //Initialisation des champs de la structure servAddr
+    servAddr.sin_family = h->h_addrtype;
+    memcpy((char *)&servAddr.sin_addr.s_addr, h->h_addr_list[0], h->h_length);
+    servAddr.sin_port = htons(SERVER_PORT);
 
-  /* adresse du serveur*/
-  serveur = gethostbyname(argv[1]);
-  if (serveur == NULL) {
-    error("le serveur n'existe pas");
-  }
+    //Creaction de la socket
+    sd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sd < 0)
+    {
+        perror("Cannot open socket : ");
+        exit(ERROR);
+    }
 
-  /* initialise serv_addr avec des 0 */
-  bzero((char *) &serv_addr, sizeof(serv_addr));
-  /*definit le protocole internet*/
-  serv_addr.sin_family = AF_INET;
-  /*copie l'adresse du serveur dans serv_addr*/
-  bcopy((char *)serveur->h_addr,(char *)&serv_addr.sin_addr.s_addr,serveur->h_length);
-  /*definit le port dans serv_addr */
-  serv_addr.sin_port = htons(numero_port);
+    //Initialisation des champs de la structure localAddr
+    localAddr.sin_family = AF_INET;
+    localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    localAddr.sin_port = htons(0);
 
-  /*Connection au serveur*/
-  if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0){
-    error("impossible de se connecter au serveur");
-  }
+    //Bind
+    rc = bind(sd, (struct sockaddr *) &localAddr, sizeof(localAddr));
+    if(rc < 0)
+    {
+        printf("%s : cannot bind port TCP %u\n", argv[0], SERVER_PORT);
+        perror("Error : ");
+        exit(ERROR);
+    }
 
-  /* Communication*/
-  printf("Saisissez votre message: ");
-  bzero(buffer,256);         //le buffer est initialisé à 0
-  fgets(buffer,255,stdin);   //fgets lit l'input, et le place dans buffer
+    //Connexion au serveur
+    rc = connect(sd, (struct sockaddr *) &servAddr, sizeof(servAddr));
+    if(rc < 0)
+    {
+        perror("Cannot connect : ");
+        exit(ERROR);
+    }
 
-  /* Envoie du message au serveur*/
-  if ( write(sockfd,buffer,strlen(buffer))<0){
-    error("erreur : pendant la lecture depuis le socket");
-  }
-  bzero(buffer,256);    //le buffer est initialisé
+    //Envoi des donnees
+    for(i=2; i < argc; i++)
+    {
+        rc = send(sd, argv[i], strlen(argv[i])+1, 0);
 
-  /* reponse du serveur */
-  if (read(sockfd,buffer,255) < 0){
-    error("erreur : pendant la lecture depuis le socket");
-  }
-  printf("%s\n",buffer);
+        if(rc < 0)
+        {
+            printf("Cannot send data : ");
+            close(sd);
+            exit(ERROR);
+        }
 
-  close(sockfd);
-  return 0;
+        printf("%s : data %u send (%s)\n", argv[0], i-1, argv[i]);
+    }
+
+    return(SUCCESS);
 }

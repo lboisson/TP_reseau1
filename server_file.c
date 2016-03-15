@@ -1,94 +1,172 @@
-/* serveur TCP le numéro de port est passé comme argument */
-#include <unistd.h> /* read write */
-#include <stdlib.h> /* exit(0) */
-#include <string.h> /* bzero */
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h> /* en-tête définit la structure sockaddr_in */
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
 
-void error(char *msg) {
-  perror(msg);
-  exit(1);
+
+#define SUCCESS 0
+#define ERROR 1
+#define SERVER_PORT 1500
+#define MAX_MSG 100
+
+#define END_LINE 0x0
+
+
+
+//Declaration de la fonction read_line
+int read_line (int newSd,char * line_to_return);
+
+
+int main(int argc,char *argv[])
+{
+
+    int sd,newSd, ecriture;
+    socklen_t cliLen;
+
+    struct sockaddr_in cliAddr, servAddr;
+    char line[MAX_MSG];
+
+    FILE *fichier;
+
+    //Creation de la socket
+    sd = socket(AF_INET,SOCK_STREAM,0);
+    if(sd<0)
+    {
+  perror("Cannot open socket");
+  exit(ERROR);
+    }
+
+    //Initialisation des champs de la structure servAddr
+    servAddr.sin_family = AF_INET;
+    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servAddr.sin_port = htons (SERVER_PORT);
+
+    //Bind
+    if(bind(sd,(struct sockaddr *) &servAddr, sizeof(servAddr))<0)
+    {
+  perror("Cannot bind port");
+  exit(ERROR);
+    }
+
+    //Listen
+    listen(sd,5);
+
+    while (1)
+    {
+  printf("%s : waiting for data on port TCP %u \n",argv[0],SERVER_PORT);
+  cliLen = sizeof(cliAddr);
+
+  newSd = accept(sd,(struct sockaddr *) &cliAddr,&cliLen);
+  if(newSd<0)
+  {
+      perror("cannot accept connection");
+      exit(ERROR);
+  }
+
+  memset(line,0x0,MAX_MSG);
+
+  //Création du fichier en local
+  fichier = NULL;
+  fichier = fopen("/tmp/test_transfert_tcp.txt", "w");
+  if( fichier != NULL )
+  {
+      while(read_line(newSd,line)!= ERROR)
+      {
+          printf("%s: received from %s:TCP%d : %s \n",argv[0],inet_ntoa(cliAddr.sin_addr),ntohs(cliAddr.sin_port),line);
+
+          ecriture = fwrite( line, sizeof(char), strlen(line) , fichier);
+          if(ecriture < 0)
+          {
+              perror("Write error : ");
+              exit(ERROR);
+          }
+
+          memset(line,0x0,MAX_MSG);
+      }
+
+      fclose(fichier);
+  }
+  else
+  {
+      perror("Cannot open file : ");
+      exit(ERROR);
+  }
+
+    }
+
+    return(SUCCESS);
 }
 
-int main(int argc, char *argv[]) {
+int read_line (int newSd,char * line_to_return)
+{
+    static int rcv_ptr=0;
+    static char rcv_msg[MAX_MSG];
+    static int n;
+    int offset;
 
-  int sockfd, newsockfd, portno, n;
-  char buffer[256];
-  struct sockaddr_in serv_addr, cli_addr;
+    offset=0;
 
-  /*usage */
-  if (argc < 2)	{
-    fprintf(stderr,"usage : %s <port>\n", argv[0]);
-    exit(1);
-  }
-  /* Creation d'un socket*/
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-  if (sockfd < 0) {
-    error("impossible de creer le socket");
-  }
-  /* RAZ de l'adresse serv */
-  bzero((char *) &serv_addr, sizeof(serv_addr));
-  /* char to int */
-  portno = atoi(argv[1]);
-
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_addr.s_addr = INADDR_ANY;
-  serv_addr.sin_port = htons(portno);/* définition du port */
-
-  /* liaison entre le socker crée précédemment et la définition du serveur juste au dessus */
-  if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0){
-    error("erreur : bind impossible");
+    while(1)
+    {
+  if(rcv_ptr==0)
+  {
+      /* read data from socket */
+      memset(rcv_msg,0x0,MAX_MSG);/* init buffer */
+      n = recv(newSd,rcv_msg,MAX_MSG,0); /* wait for data */
+      if(n < 0)
+      {
+          perror(" cannot receive data ");
+          return ERROR;
+      }
+      else if(n==0)
+      {
+          printf("connection closed by client \n");
+          close(newSd);
+          return ERROR;
+      }
   }
 
-  listen(sockfd,5);/* 5 client max */
-
-  socklen_t clilen = sizeof(cli_addr);
-  newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);
-  /* extraire la première connexion de la file des connexions en attente */
-  /* créez un nouveau socket avec le même protocole  */
-  /* cli_addr contient TOUT */
-
-  if (newsockfd < 0){
-    error("erreur sur la fonction accept");
+  /* if new data read on socket */
+  /* OR */
+  /* if another lise is still in buffer */
+  /* copy ligne into 'line_to_return'*/
+  while(*(rcv_msg+rcv_ptr)!=END_LINE && rcv_ptr<n)
+  {
+      memcpy(line_to_return+offset,rcv_msg+rcv_ptr,1);
+      offset++;
+      rcv_ptr++;
   }
 
-  /* initialisation du buffer */
-  bzero(buffer,256);
-  if (read(newsockfd,buffer,255) < 0) {
-    error("impossible de lire dans le socket");
+  /* end of line + end of buffer => return line */
+  if(rcv_ptr == n-1)
+  {
+      /* set last by to END_LINE */
+      *(line_to_return+offset)=END_LINE;
+      rcv_ptr=0;
+      return ++offset;
   }
 
-  system("mkdir -p tmp");
-  char fileName[100];
-  memset (fileName, 0, sizeof (fileName));
-  strcpy(fileName, "./tmp/");
-  printf("le fichier : %s ", buffer);
-  strcat(fileName, buffer);
-  printf("va etre copié dans %s\n", fileName);
 
-  FILE * file = fopen(fileName, "w");
-
-  if (write(newsockfd,"OK",2) < 0){
-    error("impossible d'ecrire dans le socket");
+  /* end of line but still some data in buffer => return line */
+  if(rcv_ptr < n-1)
+  {
+      /* set last by to END_LINE */
+      *(line_to_return+offset)=END_LINE;
+      rcv_ptr++;
+      return ++offset;
   }
 
-  bzero(buffer,256);
-  n = read(newsockfd,buffer,255);
-  while (n != 0) {
-    if (n < 0) {
-      error("impossible de lire dans le socket");
+  /* end of buffer but line is not ended => */
+  /* wait for more data to arrive on socket */
+  if(rcv_ptr == n)
+  {
+      rcv_ptr = 0;
+  }
     }
-    fwrite(buffer, sizeof(char), n , file); // n = sizeof(buffer)
-    n = read(newsockfd,buffer,255);
-  }
-  fclose(file);
-  printf("Le fichier a ete copié.\n");
-
-  close(newsockfd);
-  close(sockfd);
-
-  return 0;
 }
