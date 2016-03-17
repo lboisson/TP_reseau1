@@ -1,0 +1,9 @@
+\select@language {french}
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {subsection}{\numberline {1.1}Historique}{2}
+\contentsline {subsection}{\numberline {1.2}Objectif du TP}{2}
+\contentsline {section}{\numberline {2}Application client/serveur echo}{2}
+\contentsline {section}{\numberline {3}Application client/serveur chifoumi}{2}
+\contentsline {section}{\numberline {4}\IeC {\'E}change de donn\IeC {\'e}es entre deux machines}{2}
+\contentsline {section}{\numberline {5}Analyse par Wireshark}{2}
+\contentsline {section}{\numberline {6}conclusion}{2}

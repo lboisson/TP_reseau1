@@ -1,0 +1,53 @@
+\documentclass[10pt,a4paper,final]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\author{Léo Boisson}
+\setlength\parindent{24pt}
+\title{\textbf{Compte rendu TP2/3 Réseau}}
+\makeindex
+
+\begin{document}
+\date{}
+\maketitle  
+\tableofcontents  
+\newpage
+
+\section{Introduction} 
+
+	\subsection{Historique}
+		Les sockets sont un ensemble de fonctions de communications, proposés en 1980 pour le \textbf{Berkeley Software Distribution} (BSD), en open source, par 								l'université de Berkeley. Elles permettent a des applications de se connecter entre elles, via un principe client/serveur.	\\
+		Aujourd'hui, les sockets sont disponibles dans quasiment tous les langages de programmations, et font offices de norme.\\
+		On distingue deux modes de communication avec les sockets :\\
+		\begin{itemize}
+		\item
+			Le mode connecté, qui utilise le protocole TCP. Dans ce mode, une connexion durable est établie entre les deux processus, afin que l'adresse de destination ne 					soit pas nécessaire à chaque envoie de données.
+		\item
+			Le mode non-connecté, qui utilise le protocole UDP. Ce mode nécessite l'adresse de destination à chaque envoi, et il n'y a pas de confirmation du bon envoi des
+			données. Ce mode est plus adapté à l'envoi de flux audio ou vidéo.
+		\end{itemize}+
+		
+	\subsection{Objectif du TP}
+		L'objectif de ce TP est d'aborder le développement de sockets, et de se familiariser avec les outils qui vont avec (les primitives). Pour cela, nous allons 
+		programmer des applications client/serveur basique, pour ensuite observer et analyser les échanges de données entre ces applications.
+	
+	
+\section{Application client/serveur echo}
+
+
+\section{Application client/serveur chifoumi}
+
+
+\section{Échange de données entre deux machines}
+
+
+\section{Analyse par Wireshark}
+
+
+\section{conclusion}
+
+
+\end{document}s
