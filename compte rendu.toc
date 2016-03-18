@@ -3,7 +3,11 @@
 \contentsline {subsection}{\numberline {1.1}Historique}{2}
 \contentsline {subsection}{\numberline {1.2}Objectif du TP}{2}
 \contentsline {section}{\numberline {2}Application client/serveur echo}{2}
-\contentsline {section}{\numberline {3}Application client/serveur chifoumi}{2}
-\contentsline {section}{\numberline {4}\IeC {\'E}change de donn\IeC {\'e}es entre deux machines}{2}
-\contentsline {section}{\numberline {5}Analyse par Wireshark}{2}
-\contentsline {section}{\numberline {6}conclusion}{2}
+\contentsline {subsection}{\numberline {2.1}principe de fonctionnement}{2}
+\contentsline {subsection}{\numberline {2.2}Code source du client}{2}
+\contentsline {subsection}{\numberline {2.3}Code source du serveur}{4}
+\contentsline {subsection}{\numberline {2.4}Analyse des trames r\IeC {\'e}seau}{7}
+\contentsline {section}{\numberline {3}Application client/serveur chifoumi}{9}
+\contentsline {section}{\numberline {4}\IeC {\'E}change de donn\IeC {\'e}es entre deux machines}{9}
+\contentsline {section}{\numberline {5}Analyse par Wireshark}{9}
+\contentsline {section}{\numberline {6}conclusion}{9}

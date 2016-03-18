@@ -108,7 +108,7 @@ int main(int argc, char * argv[])
      //Calcul de la difference entre les deux temps
     diff=(tv_retour.tv_sec-tv_envoi.tv_sec) * 1000000L + (tv_retour.tv_usec-tv_envoi.tv_usec);
 
-    printf("Durée A/R : %llu usec\n",diff);
+    printf("Duree A/R : %llu usec\n",diff);
 
     return(SUCCESS);
 }
