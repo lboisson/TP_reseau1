@@ -70,33 +70,33 @@ void gagnant(int leClient,int leServeur)
 			printf("ERROR\n");
 			exit(0);
 	}
-} 
- 
+}
+
 int main(int argc, char *argv[])
 {
     int sd, newSd;
-    int server_len ; 
-    int rc = 0, choixServeur, pid ; 
+    int server_len ;
+    int rc = 0, choixServeur, pid ;
     unsigned client_len;
     struct sockaddr_in cliAddr, servAddr;
- 
+
     sd = socket(AF_INET, SOCK_STREAM, 0);
     servAddr.sin_family = AF_INET;
     servAddr.sin_addr.s_addr = htons(INADDR_ANY);
-    servAddr.sin_port = htons(7735) ;
+    servAddr.sin_port = htons(1500) ;
     server_len = sizeof(servAddr);
- 
+
     rc = bind(sd, (struct sockaddr *) &servAddr, server_len);
     rc = listen(sd, 5);
-    
-    printf("Attente de connexion...\n"); 
- 
+
+    printf("Attente de connexion...\n");
+
     client_len = sizeof(cliAddr);
-    
+
     while(1)
     {
 	    newSd = accept(sd, (struct sockaddr *) &cliAddr, &client_len);
-	    
+
 	    if((pid = fork()) == 0)
 	    {
 	    	printf("--> Connexion du client établie\n");
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 		int jeuC;
 		printf("Début du jeu Pierre-Feuille-Ciseau\n");
 
-		rc = read(newSd, &jeuC, 1);       
+		rc = read(newSd, &jeuC, 1);
 		srand(time(NULL));
 		choixServeur = (rand() % 3)+1;
 		gagnant(jeuC,choixServeur);
@@ -112,13 +112,13 @@ int main(int argc, char *argv[])
 		write(newSd, &jeuC, 1);
 
 	    }
-	    
+
 	    else
 	    	printf("Erreur au niveau du fork !\n") ;
     }
 
- 
-    printf("Fermeture du serveur... Au revoir !\n"); 
+
+    printf("Fermeture du serveur... Au revoir !\n");
     close(newSd);
     return 0;
 }

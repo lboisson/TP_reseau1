@@ -6,7 +6,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
- 
+
+#define ERROR 1
+
 void menu()
 {
 	printf("\tChoisissez\n");
@@ -90,48 +92,49 @@ void gagnant(int leClient,int leServeur, int *scoreClient, int *scoreServeur)
 			printf("ERROR\n");
 			exit(0);
 	}
-}  
- 
+}
+
 
 int main(int argc, char *argv[])
 {
     printf("Bienvenue dans le jeu Pierre-Feuille-Ciseau\n");
     menu();
- 
+
     int sd, len, res ;
-    struct sockaddr_in localAddr;
+    struct sockaddr_in servAddr;
     int rc, n = 0 ;
     int choix , tmp;
     int scoreClient = 0, scoreServeur = 0 ;
-    
+
     char num[1];
- 
+
     sd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sd == -1) { 
-        perror("Socket create failed.\n") ; 
-        return -1 ; 
-    } 
-     
-    localAddr.sin_family = AF_INET;
-    localAddr.sin_addr.s_addr = inet_addr("127.0.0.1");/*On ne communique qu'avec nous-même, dans cet essai*/
-    localAddr.sin_port = htons(7735);
-    len = sizeof(localAddr);
- 
-    rc = connect(sd, (struct sockaddr *)&localAddr, len);
-    if(rc == -1)
-    {
-        perror("Erreur !\n");
-        exit(-1);
+    if (sd == -1) {
+        perror("Socket create failed.\n") ;
+        return -1 ;
     }
- 
+
+    servAddr.sin_family = AF_INET;
+    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servAddr.sin_port = htons(1500);
+    len = sizeof(servAddr);
+
+    //Connexion au serveur
+    rc = connect(sd, (struct sockaddr *) &servAddr, sizeof(servAddr));
+    if(rc < 0)
+    {
+        perror("Cannot connect : ");
+        exit(ERROR);
+    }
+
 	do
 	{
 		printf("\tVotre choix : ");
-		scanf("%1s",num);		
-		fflush(stdin); /*On vide le tampon ; sinon risque de probleme avec scanf*/	
+		scanf("%1s",num);
+		fflush(stdin); /*On vide le tampon ; sinon risque de probleme avec scanf*/
 		if (isdigit(num[0]))
 		{
-			choix= num[0] - '0';	
+			choix= num[0] - '0';
 		}
 		else
 		{
@@ -143,7 +146,7 @@ int main(int argc, char *argv[])
 		{
 			tmp=choix;
 			res = write(sd, &choix, 1);
-			if (res == -1) break ; 
+			if (res == -1) break ;
 			read(sd, &choix, 1);
 			gagnant(tmp,choix, &scoreClient, &scoreServeur);
 			n++ ;
@@ -161,15 +164,15 @@ int main(int argc, char *argv[])
 
 	}
     	while (n < 3);
-    	
+
 	if(scoreClient > scoreServeur)
     		printf("Vous avez gagne cette manche !\n") ;
     	else if(scoreClient == scoreServeur)
     		printf("MATCH NUL !\n") ;
     	else
     		printf("Le serveur a gagne cette manche !\n") ;
-    	
+
     close(sd);
- 
+
     exit(0);
 }
