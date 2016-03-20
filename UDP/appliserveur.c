@@ -48,8 +48,11 @@ int main(int argc, char** argv)
         return(ERROR);
     }
 
+
+
     for (;;)
     {
+
         len = sizeof(cliaddr);
 	       //Reception des mots
         n = recvfrom(sockfd,mesg,MAX_MSG,0,(struct sockaddr *)&cliaddr,&len);
@@ -57,12 +60,8 @@ int main(int argc, char** argv)
         printf("Recu :\n");
         printf("%s\n",mesg);
 
-        printf("adresse employee par le client : %d.%d.%d.%d\n",
-        (servaddr.sin_addr.s_addr&0xFF),
-        ((servaddr.sin_addr.s_addr&0xFF00)>>8),
-        ((servaddr.sin_addr.s_addr&0xFF0000)>>16),
-        ((servaddr.sin_addr.s_addr&0xFF000000)>>24));
+
     }
 
-    exit(SUCCESS); //code mort
+    exit(SUCCESS);
 }

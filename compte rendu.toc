@@ -8,6 +8,13 @@
 \contentsline {subsection}{\numberline {2.3}Code source du serveur}{4}
 \contentsline {subsection}{\numberline {2.4}Analyse des trames r\IeC {\'e}seau}{7}
 \contentsline {section}{\numberline {3}Application client/serveur chifoumi}{9}
-\contentsline {section}{\numberline {4}\IeC {\'E}change de donn\IeC {\'e}es entre deux machines}{9}
-\contentsline {section}{\numberline {5}Analyse par Wireshark}{9}
-\contentsline {section}{\numberline {6}conclusion}{9}
+\contentsline {subsection}{\numberline {3.1}Principe du chifoumi}{9}
+\contentsline {subsection}{\numberline {3.2}Code source du client}{9}
+\contentsline {subsection}{\numberline {3.3}Code source du serveur}{12}
+\contentsline {subsection}{\numberline {3.4}Analyse des trames r\IeC {\'e}seau}{15}
+\contentsline {section}{\numberline {4}\IeC {\'E}change de donn\IeC {\'e}es entre deux machines en UDP}{16}
+\contentsline {subsection}{\numberline {4.1}Objectif}{16}
+\contentsline {subsection}{\numberline {4.2}Code source du client}{16}
+\contentsline {subsection}{\numberline {4.3}Code source du serveur}{17}
+\contentsline {subsection}{\numberline {4.4}Analyse par Wireshark}{19}
+\contentsline {section}{\numberline {5}Conclusion}{19}

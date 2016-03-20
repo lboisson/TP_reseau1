@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.3.15)  18 MAR 2016 04:06
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.3.15)  20 MAR 2016 19:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -609,32 +609,75 @@ Underfull \hbox (badness 10000) in paragraph at lines 89--114
 
  []
 
-[8 <./img/wireshark_echo.png> <./img/flowchart_echo.png>] [9]
-(./compte rendu.aux) ) 
+[8 <./img/wireshark_echo.png> <./img/flowchart_echo.png>] (./q11_client.c
+[9] [10] [11]) (./q11_server.c [12] [13] [14])
+Underfull \hbox (badness 10000) in paragraph at lines 129--130
+
+ []
+
+<img/chifoumi_terminal.png, id=64, 477.785pt x 172.645pt>
+File: img/chifoumi_terminal.png Graphic file (type png)
+
+<use img/chifoumi_terminal.png>
+Package pdftex.def Info: img/chifoumi_terminal.png used on input line 134.
+(pdftex.def)             Requested size: 238.8919pt x 86.32228pt.
+ [15 <./img/chifoumi_terminal.png>]
+<img/chifoumi_flowgraph.png, id=68, 544.0325pt x 514.92375pt>
+File: img/chifoumi_flowgraph.png Graphic file (type png)
+
+<use img/chifoumi_flowgraph.png>
+Package pdftex.def Info: img/chifoumi_flowgraph.png used on input line 141.
+(pdftex.def)             Requested size: 326.42201pt x 308.95662pt.
+ (./UDP/appliclient.c [16 <./img/chifoumi_flowgraph.png>]) (./UDP/appliserveur.
+c [17] [18])
+<img/terminal_UDP.png, id=78, 316.18124pt x 89.33376pt>
+File: img/terminal_UDP.png Graphic file (type png)
+
+<use img/terminal_UDP.png>
+Package pdftex.def Info: img/terminal_UDP.png used on input line 165.
+(pdftex.def)             Requested size: 158.09023pt x 44.66676pt.
+
+<img/wireshark_UDP.png, id=79, 887.315pt x 336.25626pt>
+File: img/wireshark_UDP.png Graphic file (type png)
+
+<use img/wireshark_UDP.png>
+Package pdftex.def Info: img/wireshark_UDP.png used on input line 172.
+(pdftex.def)             Requested size: 354.91971pt x 134.5001pt.
+
+Overfull \hbox (9.91971pt too wide) in paragraph at lines 172--173
+ [][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 161--177
+
+ []
+
+[19 <./img/terminal_UDP.png> <./img/wireshark_UDP.png>] (./compte rendu.aux) ) 
 Here is how much of TeX's memory you used:
- 6391 strings out of 493085
- 82452 string characters out of 6136917
- 325317 words of memory out of 5000000
- 9749 multiletter control sequences out of 15000+600000
+ 6545 strings out of 493085
+ 84562 string characters out of 6136917
+ 361317 words of memory out of 5000000
+ 9886 multiletter control sequences out of 15000+600000
  20049 words of font info for 54 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,12n,49p,383b,1774s stack positions out of 5000i,500n,10000p,200000b,80000s
- </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/eccc10
-00.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0800.600pk> </h
-ome/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecti0800.600pk> </home/leo/.texm
-f-var/fonts/pk/ljfour/jknappen/ec/ecbx0800.600pk> </home/leo/.texmf-var/fonts/p
-k/ljfour/jknappen/ec/ecrm0800.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jkna
-ppen/ec/ecti1000.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1
-200.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1000.600pk> </
-home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1000.600pk> </home/leo/.tex
-mf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </home/leo/.texmf-var/fonts/
-pk/ljfour/jknappen/ec/ecrm1200.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jkn
-appen/ec/ecbx1728.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmsy8.pfb>
-Output written on "compte rendu.pdf" (9 pages, 232712 bytes).
+ 
+</home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1000.600pk> </home/leo/.t
+exmf-var/fonts/pk/ljfour/jknappen/ec/ectt0800.600pk> </home/leo/.texmf-var/font
+s/pk/ljfour/jknappen/ec/ecti0800.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/j
+knappen/ec/ecbx0800.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ec
+rm0800.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1000.600pk>
+ </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </home/leo/.
+texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1000.600pk> </home/leo/.texmf-var/fon
+ts/pk/ljfour/jknappen/ec/ecbx1000.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/
+jknappen/ec/ecbx1440.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/e
+crm1200.600pk> </home/leo/.texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1728.600pk
+></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+Output written on "compte rendu.pdf" (19 pages, 395286 bytes).
 PDF statistics:
- 496 PDF objects out of 1000 (max. 8388607)
- 73 compressed objects within 1 object stream
+ 571 PDF objects out of 1000 (max. 8388607)
+ 95 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 41 words of extra memory for PDF output out of 10000 (max. 10000000)
 

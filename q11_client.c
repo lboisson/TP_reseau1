@@ -28,7 +28,7 @@ int main(int argc, char * argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	//resolution de l'hôte
+	//resolution de l'hote
 	serverHost = gethostbyname(argv[1]);
 	if (serverHost == NULL) {
 		printf("Unknown host %s.\n", argv[1]);

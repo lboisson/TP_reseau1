@@ -114,15 +114,76 @@
 		\newpage		
 		
 \section{Application client/serveur chifoumi}
+	\subsection{Principe du chifoumi}
+		Le but de ce programme est de faire jouer l'utilisateur, par l'application client, contre le serveur. Le client enverras son choix, pierre, feuille, ou ciseaux,
+		au serveur, et le serveur choisiras aléatoirement l'un des 3. \\
+		On affiche les scores, et la partie se finie au bout de 3 victoires, après quoi la connexion seras perdue.
+
+	\subsection{Code source du client}
+		\lstinputlisting{q11_client.c}
+
+	\subsection{Code source du serveur}
+		\lstinputlisting{q11_server.c}
+
+	\subsection{Analyse des trames réseau}
+		Voici ce qu'afficheras le client (pour le premier tour de jeu) :\\
+		
+		\begin{figure}[!h] 
+			\centering
+			\caption{client chifoumi :}
+			\includegraphics[scale=0.5]{img/chifoumi_terminal.png} 
+		\end{figure}
+		\newpage
+		On peut regarder ensuite le flowchart de wireshark pour cet échange :\\
+		\begin{figure}[!h] 
+			\centering
+			\caption{flowgraph de l'echange :}
+			\includegraphics[scale=0.6]{img/chifoumi_flowgraph.png} 
+		\end{figure}		
+		\\
+		Comme précédemment, les trois premiers échanges correspondent au mécanisme de \textit{\textrm{handshake}}. Ensuite, on constate les échanges de "HELLO", et "CHIFOUMI", 
+		toujours suivis d'un message d'"acknowledgement".
+		
+
+\section{Échange de données entre deux machines en UDP}
+
+	\subsection{Objectif}
+		Le but de cette partie est d'échanger des chaines de caractères entre deux machine, avec une application client/serveur, et en utilisant le protocole UDP.\\
+		Comme il est dit dans l'introduction, ce mode nécessiteras l'adresse de destination pour chaque envoi de données. Il n'y aura pas non plus d'accusé de réception.
+
+	\subsection{Code source du client}
+		\lstinputlisting{UDP/appliclient.c}
+
+	\subsection{Code source du serveur}
+		\lstinputlisting{UDP/appliserveur.c}
+
+	\subsection{Analyse par Wireshark}
+		Depuis la machine avec le serveur, on obtient ceci (en exécutant "./client 192.168.1.45 1500 abcde" sur la machine avec le client) :\\
+		\begin{figure}[!h] 
+			\centering
+			\caption{serveur UDP :}
+			\includegraphics[scale=0.5]{img/terminal_UDP.png} 
+		\end{figure}
+		\\
+		Puis on regarde à l'aide de wireshark les données utiles transmises :\\
+		\begin{figure}[!h] 
+			\centering
+			\caption{wireshark UDP :}
+			\includegraphics[scale=0.4]{img/wireshark_UDP.png} 
+		\end{figure}		
+		\\
+		On constate que l'on a bien 5 bytes de données transmis, qui correspondent aux 5 derniers octets transmis : on voit qu'il s'agit du code ASCII hexadécimal des lettres 
+		abcde.\\
 
 
-\section{Échange de données entre deux machines}
+\section{Conclusion}
 
 
-\section{Analyse par Wireshark}
+	Lors de ce TP, la principale difficulté que j'ai rencontré à été que j'ai voulu rentrer tout de suite dans le code, sans être parfaitement à l'aise avec la théorie de 
+	ces protocoles. Ce qui m'as le plus aidé à été d'écrire sur une feuille le déroulement des échanges (pour le protocole TCP).\\
+	Ce TP m'auras servi à comprendre le fonctionnement des sockets, et à savoir utiliser leurs primitives. Le fait de regarder plus précisément les échanges avec Wireshark
+	à également aidé à expliciter les différences entre les protocoles.
 
-
-\section{conclusion}
 
 
 \end{document}s

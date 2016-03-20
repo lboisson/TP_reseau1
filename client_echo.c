@@ -96,7 +96,7 @@ int main(int argc, char * argv[])
     if(rc < 0)
     {
         printf("Cannot receive data : ");
-        close(sd);
+        close(sd);s
         exit(ERROR);
     }
 

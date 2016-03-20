@@ -16,9 +16,8 @@ int main(int argc, char* argv[])
 
     int sockfd;
     int port;
-    int i,n;
+    int i;
     struct sockaddr_in servaddr;
-    char recvline[MAX_MSG];
 
     //Verification du nombre d'arguments
     if(argc < 4)
@@ -47,7 +46,7 @@ int main(int argc, char* argv[])
         //Envoi du mot
         sendto(sockfd,argv[i],strlen(argv[i]),0, (struct sockaddr *)&servaddr,sizeof(servaddr));
 
-      
+
     }
 
     exit(SUCCESS);
