@@ -47,12 +47,7 @@ int main(int argc, char* argv[])
         //Envoi du mot
         sendto(sockfd,argv[i],strlen(argv[i]),0, (struct sockaddr *)&servaddr,sizeof(servaddr));
 
-        //Recupetation du retour renvoye par le serveur
-        n=recvfrom(sockfd,recvline,MAX_MSG,0,NULL,NULL);
-        recvline[n]='\0';
-
-        //Affichage du retour renvoye par le serveur
-        printf("Retour --> %s \n", recvline);
+      
     }
 
     exit(SUCCESS);

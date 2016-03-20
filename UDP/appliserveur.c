@@ -51,15 +51,17 @@ int main(int argc, char** argv)
     for (;;)
     {
         len = sizeof(cliaddr);
-	//Reception des mots
+	       //Reception des mots
         n = recvfrom(sockfd,mesg,MAX_MSG,0,(struct sockaddr *)&cliaddr,&len);
         mesg[n] = 0;
         printf("Recu :\n");
         printf("%s\n",mesg);
-        //Envoi du retour
-        sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+
+        if (getnameinfo(servaddr, len, mesg, sizeof(mesg),NULL, 0))
+               printf("could not resolve hostname");
+        else
+               printf("host=%s\n", mesg);
     }
 
     exit(SUCCESS); //code mort
 }
-
