@@ -57,10 +57,11 @@ int main(int argc, char** argv)
         printf("Recu :\n");
         printf("%s\n",mesg);
 
-        if (getnameinfo(servaddr, len, mesg, sizeof(mesg),NULL, 0))
-               printf("could not resolve hostname");
-        else
-               printf("host=%s\n", mesg);
+        printf("adresse employee par le client : %d.%d.%d.%d\n",
+        (servaddr.sin_addr.s_addr&0xFF),
+        ((servaddr.sin_addr.s_addr&0xFF00)>>8),
+        ((servaddr.sin_addr.s_addr&0xFF0000)>>16),
+        ((servaddr.sin_addr.s_addr&0xFF000000)>>24));
     }
 
     exit(SUCCESS); //code mort
